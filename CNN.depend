@@ -1,0 +1,38 @@
+# depslib dependency file v1.0
+1460053587 source:c:\users\key\desktop\cnn\layer.cpp
+	"Headers.h"
+
+1459367660 c:\users\key\desktop\cnn\headers.h
+	"vector"
+	<iostream>
+	<cstdlib>
+	<ctime>
+	<cmath>
+	"Layer.h"
+	"Neuron.h"
+	"Net.h"
+	"Function_name.h"
+
+1460051682 c:\users\key\desktop\cnn\layer.h
+
+1460742438 c:\users\key\desktop\cnn\neuron.h
+	"Function_name.h"
+
+1460741080 c:\users\key\desktop\cnn\net.h
+
+1460748958 source:c:\users\key\desktop\cnn\main.cpp
+	<iostream>
+	"Headers.h"
+
+1460749290 source:c:\users\key\desktop\cnn\net.cpp
+	"Headers.h"
+
+1460743103 source:c:\users\key\desktop\cnn\neuron.cpp
+	"Headers.h"
+
+1460384628 c:\users\key\desktop\cnn\function_name.h
+	<cmath>
+
+1460747814 source:c:\users\key\desktop\cnn\function_name.cpp
+	"Headers.h"
+
