@@ -6,8 +6,9 @@ neuron::neuron(double (*F_T)(double),int r_n, int r_m, vector<maps*> M, vector<b
 {
 
     rec_n = r_n;
-    rec_m = r_n;
+    rec_m = r_m;
     weights.resize(rec_n*rec_m*M.size());
+    //cout<<"rec n = "<<r_n<<" rec m = "<<r_m<<" size ="<<M.size()<<endl;
     weight_ini();
     function_type = F_T;
     inputs = M;
@@ -91,19 +92,14 @@ void neuron::activate()
 
                 field.clear();
     }
-    /*for (int i = 0; i < feature_map.size(); i++)
-    {
-        for (int l = 0; l < feature_map[0].size(); l++)
-            cout<<feature_map[i][l]<<"  ";
-        cout<<endl;
-    }*/
+
 }
 
 void neuron::convolution ()
 {
-    int v = inputs.size();
-    int n = inputs[0]->n;
-    int m = inputs[0]->m;
+    int v = inputs.size(); // количество карт подаваемых на вход
+    int n = inputs[0]->n; // высота
+    int m = inputs[0]->m; // ширина
     vector<double> field;
     int new_n = 0, new_m = 0;
     for (int it = 0; it < (n - rec_n +1)* (m - rec_m +1); it++)
@@ -207,6 +203,7 @@ void neuron::info_inputs()
             for (int m = 0; m <temp.m; m++)
             cout<<temp[k][m]<<" ";
             cout<<endl;
+            ;
         }
     }
 
@@ -226,11 +223,14 @@ maps::maps(const double* mas,int n,int m)
     this->n = n;
     this->m = m;
     for (int i = 0; i < n; i++)
+    {
         for(int j = 0; j < m; j++)
         {
-            this->map[i][j] = mas[i*n + j];
-            //cout<<mas[i*n + j];
+            this->map[i][j] = mas[i*m + j];
+            //cout<<mas[i*m + j]<<" ";
         }
+        //cout<<endl;
+    }
 
 }
 maps::maps(vector<vector<double> > mm)

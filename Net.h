@@ -1,6 +1,7 @@
 #ifndef NET_H_INCLUDED
 #define NET_H_INCLUDED
 
+
 class net
 {
 
@@ -12,10 +13,11 @@ class net
     vector<vector<vector<double> > > d_weights;
     int n; // количество слоев
 public:
-    net(maps Image, vector<maps> Con, vector<vector<int> > Info);
+    net(maps Image, vector<maps> Con , vector<vector<int> > Info);
     void result(maps Image);
     void back_propogation(vector<double> target, maps Image);
     void info();
+    void back_prop_info();
 
 };
 

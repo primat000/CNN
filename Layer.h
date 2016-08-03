@@ -10,7 +10,7 @@ public:
     void resize(int n);
     int size();
     neuron & operator[](int n);
-    vector<double> OUT(vector<double> set);
+    //vector<double> OUT(vector<double> set);
     vector<double> Inputs();
 };
 
