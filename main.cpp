@@ -1,15 +1,12 @@
 #include <iostream>
 #include "Headers.h"
-#include <stdio.h>
+#include <cstdio>
 using namespace std;
 double f(double x);
 vector<int> magic(int *v, int n);//из массива в вектор
 
 int main()
 {
-
-
-
     double my[3][3] = {{0,1,1},{1,1,1},{1,1,1}}; //
     double mmy[3][3] = {{1,1,1},{1,0,1},{1,1,1}}; // conection
     maps m1(&my[0][0],3,3),m2(&mmy[0][0],3,3);
@@ -116,39 +113,38 @@ int main()
     CNN.info();*/
     double Im1[6][6] = {{-1,0,0,0,0,1},{1,0,0,0,0,0},{0,1,-1,0,0,1},{1,1,0,0,0,0},{1,0,1,0,0,1},{0,0,1,0,1,0}};
     maps IIm1(&Im1[0][0],6,6);
-    vector<double> V1(4); // target
+    vector<double> V1(3); // target
     vector<vector<int> > Info(4);
+    Info[0].push_back(3);////////
     Info[0].push_back(3);
     Info[0].push_back(3);
     Info[0].push_back(3);
-    Info[0].push_back(3);
-    Info[1].push_back(2);
+    Info[1].push_back(2);////////////
     Info[1].push_back(3);
     Info[1].push_back(2);
     Info[1].push_back(2);
-    Info[2].push_back(1);
+    Info[2].push_back(2);////////
     Info[2].push_back(1);
     Info[2].push_back(2);
     Info[2].push_back(2);
-    Info[3].push_back(4);
+    Info[3].push_back(3);///////
     Info[3].push_back(3);
     Info[3].push_back(2);
     Info[3].push_back(2);
     V1[0] = 0.5;
     V1[1] = 0;
     V1[2] = 0;
-    V1[3] = 0;
     net CNN(IIm1, Maps, Info);
     //CNN.result(IIm1);
     //CNN.back_prop_info();
-    CNN.info();
-    for (int i = 0; i < 1; i++)
+    //CNN.info();
+    for (int i = 0; i < 2; i++)
     {
         CNN.back_propogation(V1,IIm1);
+        CNN.back_prop_info();
     }
 
-
-    CNN.back_prop_info();
+    //CNN.back_prop_info();
     CNN.result(IIm1);
     return 0;
 }

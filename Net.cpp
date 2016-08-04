@@ -100,42 +100,67 @@ void net::back_propogation(vector<double> target, maps Image)
         }
     }
     ///****ошибка на остальных сло€х****///
-    for (int nl = list_layers.size() - 2; nl > -1; nl--)//cl = layer's number
+    for (int nl = list_layers.size() - 2; nl > -1; nl--)//nl = layer's number
     {
+        // создаем массивы дл€ весов и €чеек св€зывающие карту след. сло€ с предыдущим
+        vector<vector<vector<int> > > mas_weights, mas_cell;
+        mas_weights.resize(d_outs[nl][0].n);
+        mas_cell.resize(d_outs[nl][0].n);
+        for (int i = 0; i < d_outs[nl][0].n; i++)
+        {
+            mas_weights[i].resize(d_outs[nl][0].m);
+            mas_cell[i].resize(d_outs[nl][0].m);
+        }
+        //cout<<"\nok nl = "<<nl<<endl;
+        int n_next = d_outs[nl+1][0].n, m_next = d_outs[nl+1][0].m;//sizes of next maps
+        //cout<<"n_next = "<<n_next<<"  m_next = "<<m_next<<endl;
+
+        for (int i = 0; i < n_next; i++)
+        {
+            int sh_n = 1, sh_m = 1;
+            int Begin_i = i * sh_n;
+            for(int j = 0; j < m_next; j++)
+            {
+                int Begin_j = j * sh_m;
+                for (int n = Begin_i; n < Begin_i+list_layers[nl+1][0].get_rec_n(); n++)
+                    for (int m = Begin_j; m < Begin_j+list_layers[nl+1][0].get_rec_m(); m++)
+                    {
+                        mas_cell[n][m].push_back(i*m_next+j);
+                        mas_weights[n][m].push_back((n-Begin_i)*(list_layers[nl+1][0].get_rec_m())+(m-Begin_j));
+                        //if (nl == 2) cout<<"n ="<<n<<" m ="<<m<<" cell ="<<(i*m_next+j)<< "wieght = "<<((n-Begin_i)*(list_layers[nl+1][0].get_rec_m())+(m-Begin_j))<<endl;
+
+                    }
+            }
+        }
+        //cout<<"\nok1 nl = "<<nl<<endl;
+
         // получаем распределение ошибки на картах нейронов
         for (int i = 0; i < list_layers[nl].size(); i++)//номер карты нейронов
         {
-            int m_b_i[d_outs[nl][i].n], m_e_i[d_outs[nl][i].n];//чтобы посмотреть к каким нейронам относитс€ данный выход
-            int m_b_j[d_outs[nl][i].m], m_e_j[d_outs[nl][i].m];
-            int temp_rec_n = list_layers[nl+1][0].get_rec_n() , temp_rec_m = list_layers[nl+1][0].get_rec_m();
-            //cout<<"\n temp_rec_n = "<<temp_rec_n<<endl;
-            for (int j = 0; j < d_outs[nl][i].n; j++) if (j < temp_rec_n) m_b_i[j] = 0; else m_b_i[j] = m_b_i[j-1] + 1;
-            for (int j = 0; j < d_outs[nl][i].m; j++) if (j < temp_rec_m) m_b_j[j] = 0; else m_b_j[j] = m_b_j[j-1] + 1;
-            for (int j = 0; j < (d_outs[nl][i].n + 1)/2; j++)
-                    if (j < temp_rec_n) m_e_i[0 + j] = m_e_i[d_outs[nl][i].n - 1 - j] = j+1;
-                    else m_e_i[0 + j] = m_e_i[d_outs[nl][i].n - 1 - j] = temp_rec_n;
-            for (int j = 0; j < (d_outs[nl][i].m + 1)/2; j++)
-                    if (j < temp_rec_m) m_e_j[0 + j] = m_e_j[d_outs[nl][i].m - 1 - j] = j+1;
-                    else m_e_j[0 + j] = m_e_j[d_outs[nl][i].m - 1 - j] = temp_rec_m;
-            //for (int j = 0; j < temp_rec_n; j++) cout<<"\n begin = "<<m_b_i[j]<<" end = "<<m_e_i[j]<<endl;
             for (int k = 0; k < d_outs[nl][i].n; k++)
             {
                 for (int m = 0; m < d_outs[nl][i].m; m++)
                 {
                     d_outs[nl][i][k][m] = 0;
-                    for (int v = 0; v < list_layers[nl+1].size(); v++)
-                        for (int i_ = 0; i_ < m_b_i[k]+m_e_i[k]; i_++)
-                            for (int j_ = 0; j_ < m_b_j[m]+m_e_j[m]; j_++)
+                    for (int v = 0; v < list_layers[nl+1].size(); v++)//количество карт в след. слое
+                    {
+                        //cout<<"\nlist_layers[nl+1].size()"<<list_layers[nl+1].size()<<endl;
+                        //if (nl ==1 )cout<<"mas_cell[k][m].size() ="<<mas_cell[k][m].size()<<endl;
+                        for (int p = 0; p < mas_cell[k][m].size(); p++)
                         {
-                            int temp_weight = i*d_outs[nl][i].n*d_outs[nl][i].m+k*d_outs[nl][i].n+m;
-                            if(nl == 1)cout<<"\nnl = "<<nl<<" neqron = "<<i<<" k = "<<k<<" m = "<<m<<" temp_weight = "<<temp_weight<<"  "<<list_layers[nl+1][v].get_weight(temp_weight)<<endl;
-                            d_outs[nl][i][k][m]+= d_outs[nl+1][v][i_][j_]*d_th(list_layers[nl+1][v].Sigma[i_][j_])*list_layers[nl+1][v].get_weight(temp_weight);
-                            if(abs(d_outs[nl][i][k][m]) >= 1) d_outs[nl][i][k][m] = 1;
-                            //cout<<"\nweight = "<<list_layers[nl+1][v].get_weight(temp_weight)<<" vkm = "<<temp_weight<<endl;
+                            //if (nl ==1 )cout<<"nl = "<<nl<<" i = "<<i<<" k = "<<k<<" m = "<<m <<" weightt ="<<mas_weights[k][m][p]+i*list_layers[nl+1][v].get_rec_n()*list_layers[nl+1][v].get_rec_m() <<endl;
+                            double temp_weight = list_layers[nl+1][v].get_weight(mas_weights[k][m][p] + i*list_layers[nl+1][v].get_rec_n()*list_layers[nl+1][v].get_rec_m());
+                            //cout<<"temp_weight = "<< temp_weight<<endl;
+                            int i_ = mas_cell[k][m][p]/d_outs[nl+1][v].n, j_ = mas_cell[k][m][p]- d_outs[nl+1][v].m*i_;
+                            d_outs[nl][i][k][m]+= d_outs[nl+1][v][i_][j_]*d_th(list_layers[nl+1][v].Sigma[i_][j_])*temp_weight;
+                            //cout<<"nl = "<<nl<<"i = "<<i<<"k = "<<k<<" m = "<<m <<" outs ="<<d_outs[nl][i][k][m]<<endl;
                         }
+                    }
+
                    //if(nl==1) cout<<"nl = "<<nl<<"i = "<<i<<"k = "<<k<<" m = "<<m <<" outs ="<<d_outs[nl][i][k][m]<<endl;
                 }
             }
+
             //получаем распределение ошибки на весах //
             int n = list_layers[nl][i].inputs_n(0);
             int m = list_layers[nl][i].inputs_m(0);
@@ -152,20 +177,20 @@ void net::back_propogation(vector<double> target, maps Image)
                         v = j / (n*m);
                         l = (j - n*m*v) / n;
                         k = j - n*m*v - l*n;
-                        //cout<<"\n v = "<<v<<" l = "<<l<<" k = "<<k<<endl;
                         maps temp = *list_layers[nl][i].get_inputs()[v];
-
-                        //cout<<"ttemp = "<<ttemp.size()<<endl;
-                        /*maps *temp = ttemp[v];
-                        cout<<temp->map[i_][j_]<<" ";*/
-                        //cout<<"temp = "<<temp->map[0][1]<<endl;
                         double t = temp[l][k];
                         d_weights[nl][i][j] += speed*d_outs[nl][i][i_][j_] * d_th(list_layers[nl][i].Sigma[i_][j_]) * t ;
-                        //p += d_outs[nl][i][i_][j_];
                     }
                 list_layers[nl][i].change_weights(j,d_weights[nl][i][j]);
-                //cout<<"\nw "<<nl<<" i "<<i<<" j "<<j<<" = "<<p<<endl;
             }
+            for (int k = 0; k < d_outs[nl][i].n; k++)
+            {
+                for (int m = 0; m < d_outs[nl][i].m; m++)
+                {
+
+                }
+            }
+
         }
     }
     for(int i = 0; i < list_layers[list_layers.size()-1].size(); i++)

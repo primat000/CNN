@@ -6,7 +6,7 @@ layer::layer(int n)
 {
     size_l = n;
     list_neurons.resize(size_l);
-}
+};
 void layer::resize(int n)
 {
     list_neurons.resize(n);

@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1460915776 source:c:\users\key\desktop\cnn\layer.cpp
+1470251023 source:c:\users\key\desktop\cnn\layer.cpp
 	"Headers.h"
 
 1459367660 c:\users\key\desktop\cnn\headers.h
@@ -20,22 +20,22 @@
 
 1469727294 c:\users\key\desktop\cnn\net.h
 
-1470129322 source:c:\users\key\desktop\cnn\main.cpp
+1470328179 source:c:\users\key\desktop\cnn\main.cpp
 	<iostream>
 	"Headers.h"
-	<stdio.h>
+	<cstdio>
 
-1470149733 source:c:\users\key\desktop\cnn\net.cpp
+1470331043 source:c:\users\key\desktop\cnn\net.cpp
 	"Headers.h"
 	<cmath>
 
-1470126507 source:c:\users\key\desktop\cnn\neuron.cpp
+1470229774 source:c:\users\key\desktop\cnn\neuron.cpp
 	"Headers.h"
 
 1460384628 c:\users\key\desktop\cnn\function_name.h
 	<cmath>
 
-1460915885 source:c:\users\key\desktop\cnn\function_name.cpp
+1470317093 source:c:\users\key\desktop\cnn\function_name.cpp
 	"Headers.h"
 
 1460996851 c:\users\key\desktop\cnn\cimg.h

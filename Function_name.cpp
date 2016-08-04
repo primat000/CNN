@@ -1,4 +1,5 @@
 #include "Headers.h"
+
 using namespace std;
 
 namespace activation_functions
