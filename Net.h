@@ -15,10 +15,13 @@ class net
 public:
     net(maps Image, vector<maps> Con , vector<vector<int> > Info);
     void result(maps Image);
-    void back_propogation(vector<double> target, maps Image);
+    void back_propogation(vector<double> target, maps Image, double Speed = 0.4);
     void info();
     void back_prop_info();
-
+    void add_layer(int number, int count_neurons);
+    void add_neuron(int position_in_layer, int layers_number);
+    void remove_layer(int number);
+    void remove_neuron(int position_in_layer, int layers_number);
 };
 
 #endif // NET_H_INCLUDED

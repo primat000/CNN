@@ -1,6 +1,8 @@
 #include <iostream>
 #include "Headers.h"
 #include <cstdio>
+#include <stdio.h>
+
 using namespace std;
 double f(double x);
 vector<int> magic(int *v, int n);//из массива в вектор
@@ -13,7 +15,7 @@ int main()
     vector<maps> Maps;
     Maps.push_back(m1);
     //work
-    /*
+
     vector<vector<int> > Info(3);
 
     double Im1[4][4] = {{1,1,1,1},{1,0,0,1},{1,0,0,1},{1,1,1,1}};
@@ -43,7 +45,7 @@ int main()
     V4[1] = 0;
     V4[2] = 0;
     V4[3] = 0.5;
-    Info[0].push_back(2);
+    Info[0].push_back(5);
     Info[0].push_back(3);
     Info[0].push_back(2);
     Info[0].push_back(2);
@@ -54,7 +56,7 @@ int main()
     Info[2].push_back(4);
     Info[2].push_back(3);
     Info[2].push_back(2);
-    Info[2].push_back(2);*/
+    Info[2].push_back(2);
 
 
     /* i dont know
@@ -111,41 +113,52 @@ int main()
     CNN.result(ImTest);
 
     CNN.info();*/
-    double Im1[6][6] = {{-1,0,0,0,0,1},{1,0,0,0,0,0},{0,1,-1,0,0,1},{1,1,0,0,0,0},{1,0,1,0,0,1},{0,0,1,0,1,0}};
+    //test
+    /*double Im1[6][6] = {{-1,0,0,0,0,1},{1,0,0,0,0,0},{0,1,-1,0,0,1},{1,1,0,0,0,0},{1,0,1,0,0,1},{0,0,1,0,1,0}};
     maps IIm1(&Im1[0][0],6,6);
     vector<double> V1(3); // target
-    vector<vector<int> > Info(4);
-    Info[0].push_back(3);////////
+    vector<vector<int> > Info(5);
+    Info[0].push_back(5);////////
     Info[0].push_back(3);
-    Info[0].push_back(3);
-    Info[0].push_back(3);
+    Info[0].push_back(2);
+    Info[0].push_back(2);
+
     Info[1].push_back(2);////////////
     Info[1].push_back(3);
     Info[1].push_back(2);
     Info[1].push_back(2);
+
     Info[2].push_back(2);////////
     Info[2].push_back(1);
     Info[2].push_back(2);
     Info[2].push_back(2);
+
     Info[3].push_back(3);///////
     Info[3].push_back(3);
     Info[3].push_back(2);
     Info[3].push_back(2);
+
+    Info[4].push_back(3);////////
+    Info[4].push_back(3);
+    Info[4].push_back(2);
+    Info[4].push_back(2);
     V1[0] = 0.5;
     V1[1] = 0;
-    V1[2] = 0;
+    V1[2] = 0;*/
     net CNN(IIm1, Maps, Info);
-    //CNN.result(IIm1);
-    //CNN.back_prop_info();
-    //CNN.info();
-    for (int i = 0; i < 2; i++)
+    CNN.result(IIm1);
+    CNN.back_prop_info();
+    CNN.info();
+    for (int i = 0; i < 70; i++)
     {
-        CNN.back_propogation(V1,IIm1);
-        CNN.back_prop_info();
+        CNN.back_propogation(V1,IIm1, 0.3);
+        CNN.back_propogation(V2,IIm2);
+        CNN.back_propogation(V3,IIm3, 0.2);
+        CNN.back_propogation(V4,IIm4);
     }
 
-    //CNN.back_prop_info();
-    CNN.result(IIm1);
+    CNN.back_prop_info();
+    CNN.result(ImTest);
     return 0;
 }
 double f(double x)

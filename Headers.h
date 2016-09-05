@@ -1,6 +1,7 @@
 #ifndef HEADERS_H_INCLUDED
 #define HEADERS_H_INCLUDED
 
+
 #include "vector"
 #include <iostream>
 #include <cstdlib>
@@ -18,6 +19,7 @@ class net;
 #include "Neuron.h"
 #include "Net.h"
 #include "Function_name.h"
+#include "Work_with_Image.h"
 using namespace activation_functions;
 
 

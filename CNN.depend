@@ -2,7 +2,7 @@
 1470251023 source:c:\users\key\desktop\cnn\layer.cpp
 	"Headers.h"
 
-1459367660 c:\users\key\desktop\cnn\headers.h
+1470684791 c:\users\key\desktop\cnn\headers.h
 	"vector"
 	<iostream>
 	<cstdlib>
@@ -12,24 +12,26 @@
 	"Neuron.h"
 	"Net.h"
 	"Function_name.h"
+	"Work_with_Image.h"
 
 1460915762 c:\users\key\desktop\cnn\layer.h
 
-1460742438 c:\users\key\desktop\cnn\neuron.h
+1473086440 c:\users\key\desktop\cnn\neuron.h
 	"Function_name.h"
 
-1469727294 c:\users\key\desktop\cnn\net.h
+1471199678 c:\users\key\desktop\cnn\net.h
 
-1470328179 source:c:\users\key\desktop\cnn\main.cpp
+1473086694 source:c:\users\key\desktop\cnn\main.cpp
 	<iostream>
 	"Headers.h"
 	<cstdio>
+	<stdio.h>
 
-1470331043 source:c:\users\key\desktop\cnn\net.cpp
+1471201216 source:c:\users\key\desktop\cnn\net.cpp
 	"Headers.h"
 	<cmath>
 
-1470229774 source:c:\users\key\desktop\cnn\neuron.cpp
+1473086629 source:c:\users\key\desktop\cnn\neuron.cpp
 	"Headers.h"
 
 1460384628 c:\users\key\desktop\cnn\function_name.h
@@ -92,4 +94,9 @@
 	"ImfArray.h"
 	"CImg.h"
 	<stdint.h>
+
+1470390855 c:\users\key\desktop\cnn\work_with_image.h
+
+1470390899 source:c:\users\key\desktop\cnn\work_with_image.cpp
+	"Headers.h"
 

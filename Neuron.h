@@ -27,13 +27,18 @@ class neuron
     vector<bool> conections;
     double (* function_type) (double);
     vector<vector<double> > feature_map;
+    vector<vector<double> > final_feature_map;
     double EXIT;
     maps exit;
     int rec_n;
     int rec_m;
+    int sh_n;
+    int sh_m;
+    int kernel_n;
+    int kernel_m;
     int step;
 public:
-    neuron(double (*F_T)(double) = th, int r_n = 1, int r_m = 1, vector<maps*> M = {}, vector<bool> C = {});
+    neuron(double (*F_T)(double) = th, int r_n = 1, int r_m = 1, vector<maps*> M = {}, int shift_n = 1, int shift_m = 1, int kernel_n = 1, int kernel_m = 1);
     void convolution ();
     maps* get_exit();
     void activate();//для конструктора
@@ -54,6 +59,7 @@ public:
     int get_rec_m();
     double get_weight(int n);
     void info_inputs();
+    int count_of_maps();
 };
 
 

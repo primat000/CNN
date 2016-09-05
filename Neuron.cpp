@@ -2,7 +2,7 @@
 using namespace std;
 
 /*................class neuron...............*/
-neuron::neuron(double (*F_T)(double),int r_n, int r_m, vector<maps*> M, vector<bool> C)
+neuron::neuron(double (*F_T)(double),int r_n, int r_m, vector<maps*> M, int shift_n, int shift_m, int Kernel_n, int Kernel_m)
 {
 
     rec_n = r_n;
@@ -12,14 +12,17 @@ neuron::neuron(double (*F_T)(double),int r_n, int r_m, vector<maps*> M, vector<b
     weight_ini();
     function_type = F_T;
     inputs = M;
-    conections = C;
-    step = 1; //////////////default
+    step =1;/// delete
+    kernel_n = Kernel_n;  //////////////default = 1
+    kernel_m = Kernel_m;  //////////////default = 1
     EXIT = 0;
+    sh_n = shift_n; //////////////default = 1
+    sh_m = shift_m; //////////////default = 1
 
 }
 void neuron::weight_ini()
 {
-    //srand(time(0));
+    srand(time(0));
     for (int i = 0; i < weights.size(); i++)
         {
             weights[i] = (rand() % 1000)/1000.0;
@@ -55,15 +58,24 @@ void neuron::activate()
     int m = inputs[0]->m;
     vector<double> field;
     int new_n = 0, new_m = 0;
-    feature_map.resize(n - rec_n +1);
-    Sigma.resize(n - rec_n + 1);
-    for (int i = 0; i < feature_map.size(); i++)
+    int feature_map_size_n = (n - rec_n)/sh_n + 1, feature_map_size_m = (m - rec_m)/sh_m + 1;
+    //cout<<"\nfeature_map_size_n = "<< feature_map_size_n<< "\t feature_map_size_m ="<<feature_map_size_m;
+    /*feature_map.resize(n - rec_n +1);
+    Sigma.resize(n - rec_n + 1);*/
+    feature_map.resize(feature_map_size_n);
+    Sigma.resize(feature_map_size_n);
+    /*for (int i = 0; i < feature_map.size(); i++)
     {
         feature_map[i].resize(m - rec_m +1);
         Sigma[i].resize(m-rec_m + 1);
+    }*/
+    for (int i = 0; i < feature_map_size_n; i++)
+    {
+        feature_map[i].resize(feature_map_size_m);
+        Sigma[i].resize(feature_map_size_m);
     }
 
-    for (int it = 0; it < (n - rec_n +1)* (m - rec_m +1); it++)
+    for (int it = 0; it < (feature_map_size_n)* (feature_map_size_m); it++)
     {
         for (int k = 0; k < v; k++)
         {
@@ -207,6 +219,11 @@ void neuron::info_inputs()
         }
     }
 
+}
+
+int neuron::count_of_maps()
+{
+    return inputs.size();
 }
 
 /*................class map...............*/

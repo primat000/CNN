@@ -68,9 +68,9 @@ net::net(maps IMAGE, vector<maps> Con, vector<vector<int> > Info)
 
 }
 
-void net::back_propogation(vector<double> target, maps Image)
+void net::back_propogation(vector<double> target, maps Image, double Speed)
 {
-    double speed = 0.2;
+    double speed = Speed;
     vector<double> a(list_layers[list_layers.size()-1].size());//здесь храним выходы последнего слоя
 
     ///*****прогон картинки****////
@@ -94,7 +94,7 @@ void net::back_propogation(vector<double> target, maps Image)
             k = j - n*m*v - l*n;
             maps temp = *list_layers[list_layers.size()-1][i].get_inputs()[v];
             double t = temp[l][k];
-            d_weights[d_weights.size()-1][i][j] = speed*d_outs[d_outs.size()-1][i][0][0] * d_th(list_layers[list_layers.size()-1][i].Sigma[0][0]) * t ;
+            d_weights[d_weights.size()-1][i][j] = d_outs[d_outs.size()-1][i][0][0] * d_th(list_layers[list_layers.size()-1][i].Sigma[0][0]) * t ;
             //cout<<"\nw "<<list_layers.size()-1<<" i "<<i<<" j "<<j<<" = "<<t<<endl;
             //list_layers[list_layers.size()-1][i].change_weights(j,d_weights[d_weights.size()-1][i][j]);
         }
@@ -162,13 +162,13 @@ void net::back_propogation(vector<double> target, maps Image)
             }
 
             //получаем распределение ошибки на весах //
-            int n = list_layers[nl][i].inputs_n(0);
-            int m = list_layers[nl][i].inputs_m(0);
+            int n = list_layers[nl][i].inputs_n(0); //sizes of image to enter
+            int m = list_layers[nl][i].inputs_m(0); //
             //cout<<"\n n = "<<n<<" m = "<<m<<endl;
             for (int j = 0; j < d_weights[nl][i].size(); j++)
             {
                 d_weights[nl][i][j] = 0;
-                vector<maps*> ttemp = list_layers[nl][i].get_inputs();
+                /*vector<maps*> ttemp = list_layers[nl][i].get_inputs();
                 double p = 0;
                 for (int i_ = 0; i_ < d_outs[nl][i].n; i_++)
                     for (int j_ = 0; j_ < d_outs[nl][i][i_].size(); j_++)
@@ -181,23 +181,71 @@ void net::back_propogation(vector<double> target, maps Image)
                         double t = temp[l][k];
                         d_weights[nl][i][j] += speed*d_outs[nl][i][i_][j_] * d_th(list_layers[nl][i].Sigma[i_][j_]) * t ;
                     }
-                list_layers[nl][i].change_weights(j,d_weights[nl][i][j]);
+                list_layers[nl][i].change_weights(j,d_weights[nl][i][j]);*/
             }
-            for (int k = 0; k < d_outs[nl][i].n; k++)
+        // mas_weights and mas_cell for prev. layer
+        vector<vector<vector<int> > > new_mas_weights, new_mas_cell;
+
+        new_mas_weights.resize(n);
+        new_mas_cell.resize(n);
+        for (int i = 0; i < n; i++)
             {
-                for (int m = 0; m < d_outs[nl][i].m; m++)
+                new_mas_weights[i].resize(m);
+                new_mas_cell[i].resize(m);
+            }
+
+
+        //cout<<"\nok nl = "<<nl<<endl;
+        int n_next = d_outs[nl][0].n, m_next = d_outs[nl][0].m;//sizes of this maps
+
+        for (int i = 0; i < n_next; i++)
+        {
+            int sh_n = 1, sh_m = 1;
+            int Begin_i = i * sh_n;
+            for(int j = 0; j < m_next; j++)
+            {
+                int Begin_j = j * sh_m;
+                for (int n = Begin_i; n < Begin_i+list_layers[nl][0].get_rec_n(); n++)
+                    for (int m = Begin_j; m < Begin_j+list_layers[nl][0].get_rec_m(); m++)
+                    {
+
+                        new_mas_cell[n][m].push_back(i*m_next+j);
+                        new_mas_weights[n][m].push_back((n-Begin_i)*(list_layers[nl][0].get_rec_m())+(m-Begin_j));
+                        //cout<<"n ="<<n<<" m ="<<m<<" cell ="<<(i*m_next+j)<< "wieght = "<<((n-Begin_i)*(list_layers[nl+1][0].get_rec_m())+(m-Begin_j))<<endl;
+                        //cout<< "new_mas_cell["<<n<<"]["<<m<<"].size = "<<new_mas_cell[n][m].size()<<endl;
+                    }
+            }
+        }
+        //cout<<"ok"<<endl;cou
+        //cout<<"list_layers[nl][i].count_of_maps()"<<list_layers[nl][i].count_of_maps()<<endl;
+        for (int count_prev_n_l = 0; count_prev_n_l < list_layers[nl][i].count_of_maps(); count_prev_n_l++)
+        {
+            for (int k = 0; k < list_layers[nl][i].inputs_n(0); k++)// |
+            {
+                for (int t = 0; t < list_layers[nl][i].inputs_m(0); t++)// -
                 {
+                    //cout<< "new_mas_cell["<<k<<"]["<<t<<"].size = "<<new_mas_cell[k][t].size()<<endl;
+                    for (int p = 0; p < new_mas_cell[k][t].size(); p++)// count in cell
+                    {
+                        //cout<<"ok"<<endl;
+                        int i_ = new_mas_cell[k][t][p]/d_outs[nl][i].m, j_ = new_mas_cell[k][t][p] - i_*d_outs[nl][i].m;
+                        maps temp = *list_layers[nl][i].get_inputs()[count_prev_n_l];
+                        double temp_inp = temp[k][t];
+                        //if (nl == 2)cout<<" k = "<<k<<" t = "<< t<< " p = " << p << " number weight = "<< new_mas_weights[k][t][p]<<endl;// + count_prev_n_l*list_layers[nl][i].get_rec_n()*list_layers[nl][i].get_rec_m()<<endl;
+                        d_weights[nl][i][new_mas_weights[k][t][p] + count_prev_n_l*list_layers[nl][i].get_rec_n()*list_layers[nl][i].get_rec_m()] += d_outs[nl][i][i_][j_]*d_th(list_layers[nl][i].Sigma[i_][j_])*temp_inp;
+                    }
 
                 }
             }
+        }
 
         }
     }
-    for(int i = 0; i < list_layers[list_layers.size()-1].size(); i++)
-    {
-        for (int j = 0; j < list_layers[list_layers.size()-1][i].count_weights(); j++)
-            list_layers[list_layers.size()-1][i].change_weights(j,d_weights[d_weights.size()-1][i][j]);
-    }
+    // change weights
+    for(int i = 0; i < d_weights.size(); i++)
+        for (int j = 0; j < d_weights[i].size(); j++)
+            for(int q = 0; q < list_layers[i][j].count_weights(); q++)
+            list_layers[i][j].change_weights(q,speed*d_weights[i][j][q]);
     //info();
 }
 
@@ -319,3 +367,13 @@ void net::back_prop_info()
         cout<<endl;
     }
 }
+void net::add_layer(int number, int count_neurons)
+{
+    n ++;
+}
+void net::add_neuron(int position_in_layer, int layers_number)
+{
+    if ( layers_number == n ) exit.insert(exit.begin()+position_in_layer, 0);
+}
+/*void net::remove_layer(int number);
+void net::remove_neuron(int position_in_layer, int layers_number);*/
