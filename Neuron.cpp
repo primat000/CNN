@@ -2,19 +2,18 @@
 using namespace std;
 
 /*................class neuron...............*/
-neuron::neuron(double (*F_T)(double),int r_n, int r_m, vector<maps*> M, int shift_n, int shift_m, int Kernel_n, int Kernel_m)
+neuron::neuron(double (*F_T)(double),int r_n, int r_m, vector<maps*> M, int shift_n, int shift_m, int K)
 {
 
     rec_n = r_n;
     rec_m = r_m;
+    Kernel = K;
     weights.resize(rec_n*rec_m*M.size());
     //cout<<"rec n = "<<r_n<<" rec m = "<<r_m<<" size ="<<M.size()<<endl;
     weight_ini();
     function_type = F_T;
     inputs = M;
     step =1;/// delete
-    kernel_n = Kernel_n;  //////////////default = 1
-    kernel_m = Kernel_m;  //////////////default = 1
     EXIT = 0;
     sh_n = shift_n; //////////////default = 1
     sh_m = shift_m; //////////////default = 1
@@ -22,12 +21,13 @@ neuron::neuron(double (*F_T)(double),int r_n, int r_m, vector<maps*> M, int shif
 }
 void neuron::weight_ini()
 {
-    srand(time(0));
+
     for (int i = 0; i < weights.size(); i++)
         {
-            weights[i] = (rand() % 1000)/1000.0;
+            weights[i] = (rand() % 5000)/10000.0;
             //cout<<"w ="<<weights[i]<<endl;
         }
+    w0 = (rand() % 5000)/10000.0;
    //cout<<endl;
 }
 
@@ -44,11 +44,22 @@ maps* neuron::get_exit()
             cout<<feature_map[i][l]<<"  ";
         cout<<endl;
     }*/
+
     if (feature_map.size() == feature_map[0].size() == 1) {EXIT = feature_map[0][0];}
     maps temp(feature_map);
     exit = temp;
-    return &exit;
+    return &fea;
 
+}
+void neuron::info_feature()
+{
+    cout<<"feature map sizes n = "<<feature_map_n()<<"\t m = "<<feature_map_m()<<endl;
+    for (int i = 0; i < feature_map.size(); i++)
+    {
+        for (int l = 0; l < feature_map[0].size(); l++)
+            cout<<feature_map[i][l]<<"  ";
+        cout<<endl;
+    }
 }
 
 void neuron::activate()
@@ -60,51 +71,36 @@ void neuron::activate()
     int new_n = 0, new_m = 0;
     int feature_map_size_n = (n - rec_n)/sh_n + 1, feature_map_size_m = (m - rec_m)/sh_m + 1;
     //cout<<"\nfeature_map_size_n = "<< feature_map_size_n<< "\t feature_map_size_m ="<<feature_map_size_m;
-    /*feature_map.resize(n - rec_n +1);
-    Sigma.resize(n - rec_n + 1);*/
+
     feature_map.resize(feature_map_size_n);
     Sigma.resize(feature_map_size_n);
-    /*for (int i = 0; i < feature_map.size(); i++)
-    {
-        feature_map[i].resize(m - rec_m +1);
-        Sigma[i].resize(m-rec_m + 1);
-    }*/
+
     for (int i = 0; i < feature_map_size_n; i++)
     {
         feature_map[i].resize(feature_map_size_m);
         Sigma[i].resize(feature_map_size_m);
     }
 
-    for (int it = 0; it < (feature_map_size_n)* (feature_map_size_m); it++)
+    for (int in = 0; in < feature_map_size_n; in++)
     {
-        for (int k = 0; k < v; k++)
+        for (int im = 0; im < feature_map_size_m; im++)
         {
-            maps temp_map = *inputs[k];
-            for (int i = new_n; i < new_n + rec_n; i++ )
+            Sigma[in][im] = 0;
+            for (int k = 0; k < v; k++)
             {
-                for (int j = new_m; j < new_m + rec_m; j++)
+                maps temp_map = *inputs[k];
+                for (int i = in * sh_n; i < in * sh_n + rec_n; i++ )
                 {
-                    field.push_back(temp_map[i][j]);
-                    //cout<<"t_m = "<<temp_map[i][j]<<" ";
+                    for (int j = im * sh_m; j < im * sh_m + rec_m; j++)
+                    {
+                        Sigma[in][im]+= temp_map[i][j] * weights[k * rec_n * rec_m + rec_m * (i - in * sh_n) + j - im * sh_m];
+                    }
                 }
-                //cout<<endl;
             }
+            Sigma[in][im] += w0;
+            feature_map[in][im] = this->function(Sigma[in][im]);
         }
-        feature_map[new_n][new_m]=0;
-        for (int l = 0; l < field.size(); l++)
-                {
-                    feature_map[new_n][new_m]+=weights[l]*field[l];
-                }
-        Sigma[new_n][new_m] = feature_map[new_n][new_m];
-        feature_map[new_n][new_m] = this->function(Sigma[new_n][new_m]);
-
-        new_m+=step;
-        if (m - new_m < rec_m) new_n ++;
-        if (m - new_m < rec_m) new_m = 0;
-
-                field.clear();
     }
-
 }
 
 void neuron::convolution ()
@@ -114,33 +110,27 @@ void neuron::convolution ()
     int m = inputs[0]->m; // ширина
     vector<double> field;
     int new_n = 0, new_m = 0;
-    for (int it = 0; it < (n - rec_n +1)* (m - rec_m +1); it++)
-    {
-        for (int k = 0; k < v; k++)
+     for (int in = 0; in < feature_map_n(); in++)
         {
-            maps temp_map = *inputs[k];
-            for (int i = new_n; i < new_n + rec_n; i++ )
+            for (int im = 0; im < feature_map_m(); im++)
             {
-                for (int j = new_m; j < new_m + rec_m; j++)
+                Sigma[in][im] = 0;
+                for (int k = 0; k < v; k++)
                 {
-                    field.push_back(temp_map[i][j]);
+                    maps temp_map = *inputs[k];
+                    for (int i = in * sh_n; i < in * sh_n + rec_n; i++ )
+                    {
+                        for (int j = im * sh_m; j < im * sh_m + rec_m; j++)
+                        {
+                            Sigma[in][im]+= temp_map[i][j] * weights[k * rec_n * rec_m + rec_m * (i - in * sh_n) + j - im * sh_m];
+                            //cout<<"\nweights = "<<k * rec_n * rec_m + rec_m * (i - in * sh_n) + j - im * sh_m;
+                        }
+                    }
                 }
+                Sigma[in][im] += w0;
+                feature_map[in][im] = this->function(Sigma[in][im]);
             }
         }
-        feature_map[new_n][new_m]=0;
-        for (int l = 0; l < field.size(); l++)
-                {
-                    feature_map[new_n][new_m]+=weights[l]*field[l];
-                }
-        Sigma[new_n][new_m] = feature_map[new_n][new_m];
-        feature_map[new_n][new_m] = this->function(Sigma[new_n][new_m]);
-
-        new_m+=step;
-        if (m - new_m < rec_m) new_n ++;
-        if (m - new_m < rec_m) new_m = 0;
-
-                field.clear();
-    }
     /*for (int i = 0; i < feature_map.size(); i++)
     {
         for (int l = 0; l < feature_map[0].size(); l++)
@@ -192,6 +182,10 @@ void neuron::change_weights(int n, double dw)
 {
     weights[n]-=dw;
 }
+void neuron::change_zero_weights(double dw)
+{
+    w0 -= dw;
+}
 int neuron::get_rec_n()
 {
     return rec_n;
@@ -203,6 +197,10 @@ int neuron::get_rec_m()
 double neuron::get_weight(int n)
 {
     return weights[n];
+}
+double neuron::get_zero_weight()
+{
+    return w0;
 }
 void neuron::info_inputs()
 {
@@ -224,6 +222,16 @@ void neuron::info_inputs()
 int neuron::count_of_maps()
 {
     return inputs.size();
+}
+
+int neuron::get_shift_n()
+{
+    return sh_n;
+}
+
+int neuron::get_shift_m()
+{
+    return sh_m;
 }
 
 /*................class map...............*/
@@ -282,3 +290,5 @@ void maps::map_resize(int N, int M)
     for (int i = 0; i < n; i++)
         map[i].resize(m);
 }
+
+

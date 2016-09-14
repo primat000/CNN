@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1470251023 source:c:\users\key\desktop\cnn\layer.cpp
+1473788683 source:c:\users\key\desktop\cnn\layer.cpp
 	"Headers.h"
 
 1470684791 c:\users\key\desktop\cnn\headers.h
@@ -14,24 +14,25 @@
 	"Function_name.h"
 	"Work_with_Image.h"
 
-1460915762 c:\users\key\desktop\cnn\layer.h
-
-1473086440 c:\users\key\desktop\cnn\neuron.h
+1473785091 c:\users\key\desktop\cnn\layer.h
 	"Function_name.h"
 
-1471199678 c:\users\key\desktop\cnn\net.h
+1473787641 c:\users\key\desktop\cnn\neuron.h
+	"Function_name.h"
 
-1473086694 source:c:\users\key\desktop\cnn\main.cpp
+1473342723 c:\users\key\desktop\cnn\net.h
+
+1473788443 source:c:\users\key\desktop\cnn\main.cpp
 	<iostream>
 	"Headers.h"
 	<cstdio>
 	<stdio.h>
 
-1471201216 source:c:\users\key\desktop\cnn\net.cpp
+1473788443 source:c:\users\key\desktop\cnn\net.cpp
 	"Headers.h"
 	<cmath>
 
-1473086629 source:c:\users\key\desktop\cnn\neuron.cpp
+1473788117 source:c:\users\key\desktop\cnn\neuron.cpp
 	"Headers.h"
 
 1460384628 c:\users\key\desktop\cnn\function_name.h

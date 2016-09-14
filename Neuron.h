@@ -24,21 +24,20 @@ class neuron
 {
     vector<double> weights;
     vector<maps*> inputs;
-    vector<bool> conections;
     double (* function_type) (double);
     vector<vector<double> > feature_map;
     vector<vector<double> > final_feature_map;
     double EXIT;
     maps exit;
+    int Kernel;
     int rec_n;
     int rec_m;
     int sh_n;
     int sh_m;
-    int kernel_n;
-    int kernel_m;
     int step;
+    double w0;
 public:
-    neuron(double (*F_T)(double) = th, int r_n = 1, int r_m = 1, vector<maps*> M = {}, int shift_n = 1, int shift_m = 1, int kernel_n = 1, int kernel_m = 1);
+    neuron(double (*F_T)(double) = th, int r_n = 1, int r_m = 1, vector<maps*> M = {}, int shift_n = 1, int shift_m = 1, int Kernel = 1);
     void convolution ();
     maps* get_exit();
     void activate();//для конструктора
@@ -54,12 +53,18 @@ public:
     int inputs_n(int i);
     int inputs_m(int i);
     void change_weights(int n, double dw);
+    void change_zero_weights(double dw);
     vector<vector<double> > Sigma;//матрица сумм, которые подвются на вход
     int get_rec_n();
     int get_rec_m();
     double get_weight(int n);
+    double get_zero_weight();
     void info_inputs();
     int count_of_maps();
+    int get_shift_n();
+    int get_shift_m();
+    void info_feature();
+
 };
 
 
