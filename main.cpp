@@ -70,12 +70,12 @@ int main()
 
 
 
-    net CNN1(IIm1, Maps, Info);
-    CNN1.info();
+    //net CNN1(IIm1, Maps, Info);
+    //CNN1.info();
 
     //CNN1.result(IIm4);
 
-    net CNN2(IIm1, Maps, Info);
+    /*net CNN2(IIm1, Maps, Info);
     CNN2.info();
 
     CNN1.result(IIm4,1);
@@ -93,11 +93,11 @@ int main()
     }
 
     CNN1.result(IIm4,1);
-    CNN2.result(IIm1,1);
-    /*vector<maps*> Im;
+    CNN2.result(IIm1,1);*/
+    vector<maps*> Im;
     Im.push_back(&IIm1);
-    layer TestLayer(2,th, 2, 2, Im, 1, 1, 1);
-    TestLayer.info();*/
+    layer TestLayer(2,th, 2, 2, Im, 1, 1, 4);
+    TestLayer.info();
 
     //CNN1.info();
 

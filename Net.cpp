@@ -5,15 +5,15 @@ using namespace activation_functions;
 
 net::net(maps IMAGE, vector<maps> Con, vector<vector<int> > Info)
 {
-
     n = Info.size();// количество слоев
     list_layers.resize(n);
     list_layers[0].resize(Info[0][0]);// создаем первый слой
-    //cout<<"zero layer"<<endl;
     vector<maps*> Im;
     Image = IMAGE;
     Im.push_back(&Image);
 
+
+    cout<<"\n zero layer"<<endl;
     list_layers[0] = layer(list_layers[0].size(), th, Info[0][1],Info[0][2], Im, Info[0][3], Info[0][4]);
     vector<maps*> temp_feachure_maps;
 
@@ -22,7 +22,7 @@ net::net(maps IMAGE, vector<maps> Con, vector<vector<int> > Info)
        // temp_feachure_maps.resize(list_layers[i-1].size());
         temp_feachure_maps = list_layers[i-1].Get_Outs();
         layer Temp(Info[i][0], th, Info[i][1], Info[i][2], temp_feachure_maps, Info[i][3], Info[i][4]);
-        //Temp.info();
+        Temp.info();
         list_layers[i] = Temp;
     }
 

@@ -55,6 +55,7 @@ public:
     void change_weights(int n, double dw);
     void change_zero_weights(double dw);
     vector<vector<double> > Sigma;//матрица сумм, которые подвются на вход
+    vector<vector<double> > Final_Sigma;
     int get_rec_n();
     int get_rec_m();
     double get_weight(int n);
@@ -64,6 +65,7 @@ public:
     int get_shift_n();
     int get_shift_m();
     void info_feature();
+    void reduce();
 
 };
 

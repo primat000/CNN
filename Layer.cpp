@@ -16,13 +16,13 @@ layer::layer(int n , double (*F_T)(double), int r_n, int r_m, vector<maps*> M, i
     //cout<<list_neurons.size()<<endl;
     for (int i = 0; i < size_l; i++)
     {
-        neuron temp_n(F_T, r_n, r_m, M, shift_n, shift_m);
+        neuron temp_n(F_T, r_n, r_m, M, shift_n, shift_m, K_s);
         //temp_n.info_inputs();
         list_neurons[i] = temp_n;
         list_neurons[i].activate();
         list_neurons[i].get_exit();
-        //cout<<"\n exit neuron "<<i<<" :"<<endl;
-        //list_neurons[i].info_feature();
+        //cout<<"\n input neuron "<<i<<" :"<<endl;
+        //list_neurons[i].info_inputs();
     }
 
 };
@@ -42,14 +42,14 @@ neuron & layer::operator[](int n)
 }
 vector<maps*> & layer::Get_Outs()
 {
-    if (KERNEL)
+    /*if (KERNEL)
     {
         for (int i = 0; i < list_neurons.size(); i++)
         {
             maps = list_neurons[i].get_exit();
 
         }
-    }
+    }*/
     for (int i = 0; i < list_neurons.size(); i++)//создаем нейроны
     {
         OUTS[i] = list_neurons[i].get_exit();
@@ -73,6 +73,7 @@ void layer::info()
         {
             cout<<" "<<i<<" : "<<endl;
             list_neurons[i].info_inputs();
+            list_neurons[i].info_feature();
         }
 
     cout<<"\nWeights"<<endl;
