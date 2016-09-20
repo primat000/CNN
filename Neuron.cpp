@@ -10,15 +10,16 @@ neuron::neuron(double (*F_T)(double),int r_n, int r_m, vector<maps*> M, int shif
     rec_m = r_m;
     //cout<<inputs.size()<<endl;
     if (!M.empty()){
-        int t_n = inputs[0]->n;
-        int t_m = inputs[0]->m;
-        if ( t_n < rec_n) {cout<<"\nrec_n was changed"<<endl; rec_n = inputs[0]->n;}
-        if ( t_m < rec_m) {cout<<"\nrec_m was changed"<<endl; rec_m = inputs[0]->m;}
+        image_n = inputs[0]->n;
+        image_m = inputs[0]->m;
+        if ( image_n < rec_n) {cout<<"\n***rec_n was changed***"<<endl; rec_n = inputs[0]->n;}
+        if ( image_m < rec_m) {cout<<"\n***rec_m was changed***"<<endl; rec_m = inputs[0]->m;}
     }
-    else {rec_n = rec_m = 0;}
+    else {rec_n = rec_m = 0; image_n = image_m = 0;}
+    inp_size = M.size();
 
     Kernel = K;
-    cout<<"Kernel = "<<K<<endl;
+   // cout<<"in constructor Kernel = "<<K<<endl;
     weights.resize(rec_n*rec_m*M.size());
     weight_ini();
     function_type = F_T;
@@ -28,21 +29,38 @@ neuron::neuron(double (*F_T)(double),int r_n, int r_m, vector<maps*> M, int shif
     sh_n = shift_n; //////////////default = 1
     sh_m = shift_m; //////////////default = 1
 
-    /*rec_n = r_n;
+
+
+}
+neuron::neuron (int count_maps,int size_image_n, int size_image_m, int r_n, int r_m, int shift_n, int shift_m, int K,  double (*F_T)(double))
+{
+    //cout<<"file neuron"<<endl;
+    inputs.resize(count_maps);
+    inp_size = count_maps;
+    for (int i = 0; i < count_maps; i++)
+        inputs[i] = NULL;
+    rec_n = r_n;
     rec_m = r_m;
+    image_n = size_image_n;
+    image_m = size_image_m;
+    //cout<<image_n<<" "<<image_m<<endl;
+    //cout<<rec_n<<" "<<rec_m<<endl;
+
+    if ( image_n < rec_n) {cout<<"\n***rec_n was changed***"<<endl; rec_n = image_n;}
+    if ( image_m < rec_m) {cout<<"\n***rec_m was changed***"<<endl; rec_m = image_m;}
+
     Kernel = K;
-    weights.resize(rec_n*rec_m*M.size());
-    cout<<"\n weight size = "<<rec_n*rec_m*M.size()<<endl;
-    //cout<<"rec n = "<<r_n<<" rec m = "<<r_m<<" size ="<<M.size()<<endl;
-    weight_ini();
+   // cout<<"in constructor Kernel = "<<K<<endl;
+    weights.resize(rec_n*rec_m*count_maps);
+    w0 = 0;
+    //cout<<weights.size()<<endl;
     function_type = F_T;
-    inputs = M;
-    cout<<"create neuron inputs size = "<<inputs.size()<<endl;
-    cout<<"create neuron M size = "<<M.size()<<endl;
+
     step =1;/// delete
     EXIT = 0;
     sh_n = shift_n; //////////////default = 1
-    sh_m = shift_m; //////////////default = 1*/
+    sh_m = shift_m; //////////////default = 1
+
 
 }
 void neuron::weight_ini()
@@ -50,9 +68,9 @@ void neuron::weight_ini()
 
     for (int i = 0; i < weights.size(); i++)
         {
-            weights[i] = (rand() % 5000)/10000.0;
+            weights[i] = (rand() % 3000)/10000.0;
         }
-    w0 = (rand() % 5000)/10000.0;
+    w0 = (rand() % 1000)/10000.0;
 }
 
 double neuron::function(double x)
@@ -62,14 +80,13 @@ double neuron::function(double x)
 
 maps* neuron::get_exit()
 {
-    if (Kernel = 1){
+    if (Kernel == 1){
         if (feature_map.size() == feature_map[0].size() == 1) {EXIT = feature_map[0][0];}
         maps temp(feature_map);
         exit = temp;
         return &exit;
     }
     else{
-
         reduce();
         if (final_feature_map.size()==final_feature_map[0].size() == 1) {EXIT = final_feature_map[0][0];}
         maps temp(final_feature_map);
@@ -80,23 +97,31 @@ maps* neuron::get_exit()
 }
 void neuron::info_feature()
 {
-    cout<<"feature map sizes n = "<<feature_map_n()<<"\t m = "<<feature_map_m()<<endl;
-    cout<<"reduce feature map sizes n = "<<final_feature_map.size()<<"\t m = "<<feature_map_m()<<endl;
-    for (int i = 0; i < feature_map.size(); i++)
-    {
-        for (int l = 0; l < feature_map[0].size(); l++)
-            cout<<feature_map[i][l]<<"  ";
-        cout<<"\t";
-        if (!final_feature_map.empty())
-            if (i < final_feature_map.size())
-            for (int l = 0; l < final_feature_map[0].size(); l++)
-            cout<<final_feature_map[i][l]<<" ";
-        cout<<endl;
+    if (!feature_map.empty()){
+        cout<<"feature map sizes n = "<<feature_map_n()<<"\t m = "<<feature_map_m()<<endl;
+        //cout<<"reduce feature map sizes n = "<<final_feature_map.size()<<"\t m = ";
+        //if (final_feature_map.size() > 0) cout<<final_feature_map[0].size()<<endl;
+       // else cout<<0<<endl;
+        for (int i = 0; i < feature_map.size(); i++)
+        {
+            for (int l = 0; l < feature_map[0].size(); l++)
+                cout<<feature_map[i][l]<<"  ";
+            cout<<"\t";
+            if (!final_feature_map.empty())
+                if (i < final_feature_map.size())
+                for (int l = 0; l < final_feature_map[0].size(); l++)
+                cout<<final_feature_map[i][l]<<" ";
+            cout<<endl;
+        }
     }
+    else cout<<"\n***Feature map empty***"<<endl;
+
 }
 
 void neuron::activate()
 {
+    Act = true;
+    //cout<<"m = "<<inputs[0]->m<<endl;
     int v = inputs.size();
     int n = inputs[0]->n;
     int m = inputs[0]->m;
@@ -134,7 +159,7 @@ void neuron::activate()
             feature_map[in][im] = this->function(Sigma[in][im]);
         }
     }
-    cout<<"Kernal in act = "<< Kernel<<endl;
+    //cout<<"Kernal in act = "<< Kernel<<endl;
     if ((feature_map_n() < Kernel)||(feature_map_m() < Kernel)) {
             cout<<"Kernel size changed"<<endl;
             if (feature_map_n() > feature_map_m()) Kernel = feature_map_m();
@@ -146,9 +171,12 @@ void neuron::activate()
 
 void neuron::convolution ()
 {
+    //info_inputs();
     int v = inputs.size(); // количество карт подаваемых на вход
     int n = inputs[0]->n; // высота
     int m = inputs[0]->m; // ширина
+    //cout<<"v = "<<v<<" n = "<<n<<"m = "<<m<<endl;
+
     vector<double> field;
     int new_n = 0, new_m = 0;
      for (int in = 0; in < feature_map_n(); in++)
@@ -172,8 +200,9 @@ void neuron::convolution ()
                 feature_map[in][im] = this->function(Sigma[in][im]);
             }
         }
-    cout<<"Kernal in conv = "<< Kernel<<endl;
-    if (Kernel > 1) reduce();
+
+    //cout<<"Kernal in conv = "<< Kernel<<endl;
+    //if (Kernel > 1) reduce();
     /*for (int i = 0; i < feature_map.size(); i++)
     {
         for (int l = 0; l < feature_map[0].size(); l++)
@@ -201,19 +230,25 @@ int neuron::count_weights()
 }
 int neuron::feature_map_n()
 {
+    if (feature_map.empty()) return 0;
     return feature_map.size();
 }
 
 int neuron::feature_map_m()
 {
+    if (feature_map.empty()) return 0;
     return feature_map[0].size();
 }
 int neuron::inputs_n(int i)
 {
+    if (inputs.empty()) return 0;
+    if (inputs.size() < i ) { cout<<"Incorrect size inputs"<<endl; return 0;}
     return inputs[i]->n;
 }
 int neuron::inputs_m(int i)
 {
+    if (inputs.empty()) return 0;
+    if (inputs.size() < i ) { cout<<"Incorrect size inputs"<<endl; return 0;}
     return inputs[i]->m;
 }
 vector<maps*> & neuron::get_inputs()
@@ -247,8 +282,10 @@ double neuron::get_zero_weight()
 }
 void neuron::info_inputs()
 {
+    cout<<"Info_inputs"<<endl;
     for (int i = 0; i < inputs.size(); i++)
     {
+        //cout<<"Info_inputs"<<endl;
         maps temp = *inputs[i];
         cout<<"inputs "<<i<<":"<<endl;
         for (int k = 0; k < temp.n; k++)
@@ -279,12 +316,12 @@ int neuron::get_shift_m()
 
 void neuron::reduce()
 {
-    cout<<"REDUCE"<<endl;
+    //cout<<"REDUCE"<<endl;
     if (Kernel > 1)
     {
         int n_size = feature_map_n()/Kernel;
         int m_size = feature_map_m()/Kernel;
-        cout<<"reduce : n = " <<n_size<<"\t m = "<<m_size<<endl;
+        //cout<<"reduce : n = " <<n_size<<"\t m = "<<m_size<<endl;
         final_feature_map.resize(n_size);
         Final_Sigma.resize(n_size);
         for (int i = 0; i < n_size; i++)

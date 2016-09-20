@@ -37,7 +37,13 @@ class neuron
     int step;
     double w0;
 public:
-    neuron(double (*F_T)(double) = th, int r_n = 1, int r_m = 1, vector<maps*> M = {}, int shift_n = 1, int shift_m = 1, int Kernel = 1);
+
+    int inp_size;
+    int image_n;
+    int image_m;
+    bool Act = false;
+    neuron (double (*F_T)(double) = th, int r_n = 1, int r_m = 1, vector<maps*> M = {}, int shift_n = 1, int shift_m = 1, int Kernel = 1);
+    neuron (int count_maps, int size_image_n, int size_image_m, int r_n, int r_m, int shift_n, int shift_m, int Kernel, double (*F_T)(double) = th);
     void convolution ();
     maps* get_exit();
     void activate();//для конструктора
@@ -66,6 +72,12 @@ public:
     int get_shift_m();
     void info_feature();
     void reduce();
+    inline bool is_reduce(){if (Kernel > 1) return true; return false;};
+    inline int kernel(){return Kernel;};
+    inline int final_f_map_n() {if (Kernel > 1)return final_feature_map.size(); cout<<"No reduce"<<endl; return 0;}
+    inline int final_f_map_m() {if (Kernel > 1)return final_feature_map[0].size(); cout<<"No reduce"<<endl; return 0;}
+    inline void new_zero_weight(double w) { w0 = w;}
+    inline void new_weight(int n, double w) { weights[n] = w;}
 
 };
 

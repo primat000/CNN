@@ -9,8 +9,6 @@ layer::layer(int n , double (*F_T)(double), int r_n, int r_m, vector<maps*> M, i
     //cout<<"\ncostructor size_l = "<<size_l<<endl;
     //cout<<r_n<<" "<<r_m<<" "<<shift_n<<" "<<shift_m<<endl;
     Kernel_size = K_s;
-    if (Kernel_size > 1) KERNEL = true;
-    else KERNEL = false;
     OUTS.resize(size_l);
     list_neurons.resize(size_l);
     //cout<<list_neurons.size()<<endl;
@@ -24,9 +22,28 @@ layer::layer(int n , double (*F_T)(double), int r_n, int r_m, vector<maps*> M, i
         //cout<<"\n input neuron "<<i<<" :"<<endl;
         //list_neurons[i].info_inputs();
     }
-
+    if (size_l > 1) Kernel_size = list_neurons[0].kernel();
+    if (Kernel_size > 1) KERNEL = true;
+    else KERNEL = false;
+    if (n > 0) Act = list_neurons[0].Act;
 };
-
+layer::layer(int n, int count_maps,int size_image_n, int size_image_m, int r_n, int r_m, int shift_n, int shift_m, int K,  double (*F_T)(double))
+{
+    size_l = n;
+    Kernel_size = K;
+    OUTS.resize(size_l);
+    list_neurons.resize(size_l);
+    //cout<<list_neurons.size()<<endl;
+    for (int i = 0; i < size_l; i++)
+    {
+        neuron temp_n(count_maps, size_image_n, size_image_m, r_n, r_m, shift_n, shift_m, K);
+        list_neurons[i] = temp_n;
+    }
+    if (size_l > 1) Kernel_size = list_neurons[0].kernel();
+    if (Kernel_size > 1) KERNEL = true;
+    else KERNEL = false;
+    //cout<<"Layer ok"<<endl;
+}
 void layer::resize(int n)
 {
     list_neurons.resize(n);
@@ -42,14 +59,6 @@ neuron & layer::operator[](int n)
 }
 vector<maps*> & layer::Get_Outs()
 {
-    /*if (KERNEL)
-    {
-        for (int i = 0; i < list_neurons.size(); i++)
-        {
-            maps = list_neurons[i].get_exit();
-
-        }
-    }*/
     for (int i = 0; i < list_neurons.size(); i++)//создаем нейроны
     {
         OUTS[i] = list_neurons[i].get_exit();
@@ -58,16 +67,20 @@ vector<maps*> & layer::Get_Outs()
 }
 layer & layer::operator = (layer const& LAYER)
 {
+    //cout<<"Begin ";
     KERNEL = LAYER.KERNEL;
     Kernel_size = LAYER.Kernel_size;
     size_l = LAYER.size_l;
     list_neurons = LAYER.list_neurons;
-    OUTS = LAYER.OUTS;
+    if (LAYER.size_l != 0)
+    if (LAYER.Act) OUTS = LAYER.OUTS;
+    //cout<<" = is ok"<<endl;
     return *this;
 }
 void layer::info()
 {
     cout<<"\n Layer Info"<<endl;
+    if (KERNEL) cout<<"***This Layer reduce***"<<endl;
     cout<<"Count of neurons : "<<size_l<<endl;
     for (int i = 0; i < size_l; i++)
         {
