@@ -3,7 +3,7 @@
 using namespace std;
 using namespace activation_functions;
 
-net::net(maps IMAGE, vector<vector<int> > Info)
+net::net(maps & IMAGE, vector<vector<int> > Info)
 {
     n = Info.size();// количество слоев
     list_layers.resize(n);
@@ -11,11 +11,12 @@ net::net(maps IMAGE, vector<vector<int> > Info)
     vector<maps*> Im;
     Image = IMAGE;
     Im.push_back(&Image);
+    average_weight = 0;
 
 
-    cout<<"\n zero layer"<<endl;
+    //cout<<"\n zero layer"<<endl;
     list_layers[0] = layer(list_layers[0].size(), th, Info[0][1],Info[0][2], Im, Info[0][3], Info[0][4], Info[0][5]);
-    list_layers[0].info();
+    //list_layers[0].info();
     vector<maps*> temp_feachure_maps;
 
     for (int i = 1; i < n; i++) // создаем остальные слои
@@ -23,7 +24,7 @@ net::net(maps IMAGE, vector<vector<int> > Info)
        // temp_feachure_maps.resize(list_layers[i-1].size());
         temp_feachure_maps = list_layers[i-1].Get_Outs();
         layer Temp(Info[i][0], th, Info[i][1], Info[i][2], temp_feachure_maps, Info[i][3], Info[i][4], Info[i][5]);
-        Temp.info();
+        //cout<<Info[i][5];
         list_layers[i] = Temp;
     }
     preparation_backprop();
@@ -250,11 +251,13 @@ void net::back_propogation(vector<double> target, maps Image, double Speed)
                         }
                 }
             }
+            zero_d_weights[nl][i] = 0;
             for (int i_ = 0; i_ < n_next; i_++)
                 for(int j_ = 0; j_ < m_next; j_++)
                     if (list_layers[nl].is_reduce())
                         {
                             zero_d_weights[nl][i]+= d_reduce_outs[nl][i][i_][j_]*d_th(list_layers[nl][i].Sigma[i_][j_]);
+
                         }
                     else
                         {
@@ -293,13 +296,15 @@ void net::back_propogation(vector<double> target, maps Image, double Speed)
     }
 
     // change weights
+    int count_w_in_n = 0;
     for(int i = 0; i < d_weights.size(); i++)
     {
 
         for (int j = 0; j < d_weights[i].size(); j++)
             {
+                count_w_in_n += 1;
                 //speed +=0.01;
-                int n_next, m_next;
+                /*int n_next, m_next;
                 if (list_layers[i].is_reduce())
                 {
                     n_next = d_reduce_outs[i][0].n; m_next = d_reduce_outs[i][0].m;//sizes of next maps
@@ -307,12 +312,20 @@ void net::back_propogation(vector<double> target, maps Image, double Speed)
             else
                 {
                     n_next = d_outs[i][0].n; m_next = d_outs[i][0].m;//sizes of next maps
-                }
-                list_layers[i][j].change_zero_weights(0);
+                }*/
+                list_layers[i][j].change_zero_weights(speed*zero_d_weights[i][j]);
+                average_weight += sqrt(speed*zero_d_weights[i][j]*speed*zero_d_weights[i][j]);
+                //list_layers[i][j].new_zero_weight(0);
                 for(int q = 0; q < list_layers[i][j].count_weights(); q++)
-                list_layers[i][j].change_weights(q,speed*d_weights[i][j][q]);
+                {
+                    list_layers[i][j].change_weights(q,speed*d_weights[i][j][q]);
+                    average_weight += sqrt(speed*d_weights[i][j][q]*speed*d_weights[i][j][q]);
+                    count_w_in_n += 1;
+                }
+
             }
     }
+     average_weight /= count_w_in_n;
 
 
     //info();
@@ -330,6 +343,7 @@ int net::result(maps IMAGE, bool flag)
         list_layers[0][i].convolution();
     }
     vector<maps*> temp_feachure_maps;
+    //cout<<n<<endl;
     for (int i = 1; i < n; i++) // остальные слои
     {
         temp_feachure_maps.resize(list_layers[i-1].size());
@@ -337,6 +351,7 @@ int net::result(maps IMAGE, bool flag)
         for (int j = 0; j < list_layers[i-1].size(); j++)
         {
             temp_feachure_maps[j] = list_layers[i-1][j].get_exit();
+            //if (i==1)list_layers[i-1][j].info_feature();
         }
 
         for (int j = 0; j < list_layers[i].size(); j++)
@@ -344,6 +359,7 @@ int net::result(maps IMAGE, bool flag)
             list_layers[i][j].change_inputs(temp_feachure_maps);
             list_layers[i][j].convolution();
             list_layers[i][j].get_exit();
+            //if (j==0) list_layers[i][j].info_inputs();
         }
     }
     vector<double> temp(list_layers[list_layers.size()-1].size());
@@ -421,17 +437,21 @@ void net::info()
             cout<<"layer "<<i<<" : "<<endl;
             cout<<"Count of neurons : "<<list_layers[i].size()<<endl;
             cout<<"Inputs : "<<endl;
-            for (int j = 0; j < list_layers[i].size(); j++)
+            for (int j = 0; j < 1; j++)//list_layers[i].size()
                 {
                     list_layers[i][j].info_inputs();
                     cout<<endl;
-                    list_layers[i][j].info_feature();
-                    cout<<endl;
-                }
 
+                }
+            for (int j = 0; j < list_layers[i].size(); j++)
+            {
+                list_layers[i][j].info_feature();
+                    cout<<endl;
             }
 
-   /* cout<<"\nWeights"<<endl;
+        }
+
+    /*cout<<"\nWeights"<<endl;
     for (int i = 0; i < list_layers.size(); i++)
     {
         cout<<"layer : "<<i<<endl;
@@ -482,7 +502,7 @@ void net::back_prop_info()
         cout<<endl;
     }
 }
-void net::add_layer(int number, int count_neurons)
+void net::add_layer(int number, int count_neurons, int rec_n, int rec_m, int sh_n, int sh_m, int Ker)
 {
     n ++;
 }
@@ -517,11 +537,24 @@ void net::save_net(const char* filename)
     }
 
 }
-net & net::operator = (net const& NET)
+net & net::operator = (const net & NET)
 {
-    /*for (int i = 0; i < NET.net_size(); i++)
-        list_layers = NET[i];
-    return *this;*/
+    n = NET.n;
+    Image = NET.Image;
+    //cout<<"copy Image"<<endl;
+    list_layers.resize(NET.n);
+    for (int i = 0; i < NET.n; i++)
+        {
+            list_layers[i] = NET.list_layers[i];
+            //cout<<"copy layer"<<endl;
+        }
+    exit = NET.exit;
+    d_outs = NET.d_outs;
+    d_weights = NET.d_weights;
+    zero_d_weights = NET.zero_d_weights;
+    d_reduce_outs = NET.d_reduce_outs;
+    average_weight = NET.average_weight;
+    return *this;
 }
 layer & net::operator[](int n)
 {
@@ -529,6 +562,7 @@ layer & net::operator[](int n)
 }
 net::net(const char* filename)
 {
+    average_weight = 0;
     ifstream File(filename);
     File>>n;
     //cout<<n<<endl;
@@ -562,18 +596,6 @@ net::net(const char* filename)
         //cout<<"Layer"<<i<<" -ok"<<endl;
     }
 
-    //list_layers[0].info();
-    //vector<maps*> temp_feachure_maps;
-
-    /*for (int i = 1; i < n; i++) // создаем остальные слои
-    {
-       // temp_feachure_maps.resize(list_layers[i-1].size());
-        temp_feachure_maps = list_layers[i-1].Get_Outs();
-        layer Temp(Info[i][0], th, Info[i][1], Info[i][2], temp_feachure_maps, Info[i][3], Info[i][4], Info[i][5]);
-        Temp.info();
-        list_layers[i] = Temp;
-    }*/
-
 }
 /*void net::dementions_of_exits()
 {
@@ -585,3 +607,120 @@ net::net(const char* filename)
 }*/
 /*void net::remove_layer(int number);
 void net::remove_neuron(int position_in_layer, int layers_number);*/
+void net::shake(int n)
+{
+    for(int i = 0; i < d_weights.size(); i++)
+    {
+
+        for (int j = 0; j < d_weights[i].size(); j++)
+            {
+                double random = (double) (rand() % (20) - 10) *average_weight;
+
+                list_layers[i][j].change_zero_weights(random);
+                //list_layers[i][j].new_zero_weight(0);
+                for(int q = 0; q < list_layers[i][j].count_weights(); q++)
+                {
+                    random = (double) (rand() % (20) - 10) *average_weight;
+                    list_layers[i][j].change_weights(q,random);
+                }
+            }
+    }
+    cout<<"average_weight = "<<average_weight*100<<endl;
+
+}
+void net::genetic_algo(int iter, int CountOfNet, double per_mutation, vector <maps> & Train, vector<vector<double> > &Targets)
+{
+    cout<<"Start gen algo"<<endl;
+    vector<net> set_net(CountOfNet);
+    vector<double> nets_quality(CountOfNet,0);
+    vector<vector<int> > info(this->list_layers.size());
+    for (int i = 0; i < info.size(); i++)
+    {
+        info[i].resize(6);
+        info[i][0] = this->list_layers[i].size();
+        //cout<<info[i][0]<<endl;
+        info[i][1] = this->list_layers[i][0].get_rec_n();
+        //cout<<info[i][1]<<endl;
+        info[i][2] = this->list_layers[i][0].get_rec_m();
+        //cout<<info[i][2]<<endl;
+        info[i][3] = this->list_layers[i][0].get_shift_n();
+        //cout<<info[i][3]<<endl;
+        info[i][4] = this->list_layers[i][0].get_shift_m();
+        //cout<<info[i][4]<<endl;
+        info[i][5] = this->list_layers[i][0].kernel();
+        //cout<<info[i][5]<<endl;
+    }
+    for (int i = 0; i < CountOfNet; i++)
+    {
+        net TempNet(this->Image,info);
+        //cout<<"genetic_algo cr net"<<endl;
+        set_net[i] = TempNet;
+    }
+    for (int i = 0; i < CountOfNet; i++)
+    {
+        for (int j = 0; j < Train.size(); j++)
+        {
+            if (set_net[i].result(Train[j])==pos_max(Targets[j])) nets_quality[i]+=1;
+            //if ((i==0)&&(j<10)) cout<<set_net[i].result(Train[j])<<endl;
+        }
+        cout<<"quality = "<<nets_quality[i]<<endl;
+    }
+    set_net[0].result(Train[1],1);
+
+    for (int j = 0; j < set_net[0].list_layers[0].size(); j++)
+    {
+        set_net[0].list_layers[0][j].new_zero_weight(set_net[1].list_layers[0][j].get_zero_weight());
+            //set_net[0].list_layers[i][j].new_zero_weight(set_net[1].list_layers[i][j].get_zero_weight());
+            //cout<<set_net[0].list_layers[i][j].get_zero_weight()<<endl;
+        for(int q = 0; q < set_net[0].list_layers[0][j].count_weights(); q++)
+        {
+                set_net[0].list_layers[0][j].new_weight(q, set_net[1].list_layers[0][j].get_weight(q));
+                    //set_net[0].list_layers[i][j].new_weight(q,set_net[1].list_layers[i][j].get_weight(q));
+        }
+    }
+
+    nets_quality[0]=0;
+    cout<<"quality 0= "<<nets_quality[0]<<endl;
+
+    for (int j = 0; j < Train.size(); j++)
+        {
+            if (set_net[0].result(Train[j])==pos_max(Targets[j])) nets_quality[0]+=1;
+            //if ((i==0)&&(j<10)) cout<<set_net[i].result(Train[j])<<endl;
+        }
+    cout<<"quality 0= "<<nets_quality[0]<<endl;
+    for (int j = 0; j < set_net[0].list_layers[0].size(); j++)
+    {
+        set_net[0].list_layers[0][j].new_zero_weight(set_net[2].list_layers[0][j].get_zero_weight());
+            //set_net[0].list_layers[i][j].new_zero_weight(set_net[1].list_layers[i][j].get_zero_weight());
+            //cout<<set_net[0].list_layers[i][j].get_zero_weight()<<endl;
+        for(int q = 0; q < set_net[0].list_layers[0][j].count_weights(); q++)
+        {
+                set_net[0].list_layers[0][j].new_weight(q, set_net[2].list_layers[0][j].get_weight(q));
+                    //set_net[0].list_layers[i][j].new_weight(q,set_net[1].list_layers[i][j].get_weight(q));
+        }
+    }
+
+    nets_quality[0]=0;
+    cout<<"quality 0= "<<nets_quality[0]<<endl;
+
+    for (int j = 0; j < Train.size(); j++)
+        {
+            if (set_net[0].result(Train[j])==pos_max(Targets[j])) nets_quality[0]+=1;
+            //if ((i==0)&&(j<10)) cout<<set_net[i].result(Train[j])<<endl;
+        }
+    cout<<"quality 0= "<<nets_quality[0]<<endl;
+
+}
+net::net()
+{
+    n = 0;
+}
+template <typename T>
+int pos_max (vector<T> & v)
+{
+    T max = v[0];
+    int pos = 0;
+    for (int i = 0; i < v.size(); i++)
+        if (max < v[i]) { max = v[i]; pos = i;}
+    return pos;
+}

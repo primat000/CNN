@@ -65,15 +65,14 @@ vector<maps*> & layer::Get_Outs()
     }
     return OUTS;
 }
-layer & layer::operator = (layer const& LAYER)
+layer & layer::operator = (const layer & LAYER)
 {
     //cout<<"Begin ";
     KERNEL = LAYER.KERNEL;
     Kernel_size = LAYER.Kernel_size;
     size_l = LAYER.size_l;
     list_neurons = LAYER.list_neurons;
-    if (LAYER.size_l != 0)
-    if (LAYER.Act) OUTS = LAYER.OUTS;
+    if (LAYER.size_l != 0) if (LAYER.Act) OUTS = LAYER.OUTS;
     //cout<<" = is ok"<<endl;
     return *this;
 }

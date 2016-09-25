@@ -19,7 +19,7 @@ public:
     //vector<double> OUT(vector<double> set);
     vector<double> Inputs();
     vector<maps*> & Get_Outs();
-    layer & operator = (layer const& LAYER);
+    layer & operator = (const layer & LAYER);
     void info();
     inline bool is_reduce(){return KERNEL;};
 

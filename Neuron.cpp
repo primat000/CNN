@@ -68,9 +68,10 @@ void neuron::weight_ini()
 
     for (int i = 0; i < weights.size(); i++)
         {
-            weights[i] = (rand() % 3000)/10000.0;
+            weights[i] = (rand() % 9000)/10000.0 - 0.45;
         }
-    w0 = (rand() % 1000)/10000.0;
+    w0 = (rand() % 9000)/10000.0 - 0.45;
+    //cout<<w0<<endl;
 }
 
 double neuron::function(double x)
@@ -84,6 +85,7 @@ maps* neuron::get_exit()
         if (feature_map.size() == feature_map[0].size() == 1) {EXIT = feature_map[0][0];}
         maps temp(feature_map);
         exit = temp;
+        //cout<<exit[0][0]<<"\t"<<temp[0][0]<<endl;
         return &exit;
     }
     else{
@@ -125,7 +127,7 @@ void neuron::activate()
     int v = inputs.size();
     int n = inputs[0]->n;
     int m = inputs[0]->m;
-    vector<double> field;
+    vector<double> field(0);
     int new_n = 0, new_m = 0;
     int feature_map_size_n = (n - rec_n)/sh_n + 1, feature_map_size_m = (m - rec_m)/sh_m + 1;
     //cout<<"\nfeature_map_size_n = "<< feature_map_size_n<< "\t feature_map_size_m ="<<feature_map_size_m;
@@ -176,8 +178,6 @@ void neuron::convolution ()
     int n = inputs[0]->n; // высота
     int m = inputs[0]->m; // ширина
     //cout<<"v = "<<v<<" n = "<<n<<"m = "<<m<<endl;
-
-    vector<double> field;
     int new_n = 0, new_m = 0;
      for (int in = 0; in < feature_map_n(); in++)
         {

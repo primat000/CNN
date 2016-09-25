@@ -4,24 +4,12 @@
 #include <stdio.h>
 #include <fstream>
 
-    /*double Im1[8][8] = {{1,1,1,1,1,1,1,1},{1,1,0,0,0,0,1,1},{1,1,0,0,0,0,1,1},{1,1,0,0,0,0,1,1},
-    {1,1,0,0,0,0,1,1},{1,1,0,0,0,0,1,1},{1,1,0,0,0,0,1,1},{1,1,1,1,1,1,1,1}};
-    double Im2[5][5] = {{0,0,0,0,1},{0,1,1,0,1},{0,1,1,0,1},{0,0,0,0,1},{0,0,0,0,1}};
-    double Im3[5][5] = {{1,0,0,1,1},{0,1,1,0,1},{0,1,1,0,1},{1,0,0,1,1},{0,0,0,0,1}};
-    double Im4[5][5] = {{0,0,0,1,1},{0,0,1,0,1},{0,1,0,0,1},{1,0,0,0,1},{0,0,0,0,1}};
-    double Test[5][5] = {{0,0,0,0,1},{0,0,1,0,1},{0,1,0,0,1},{1,0,0,0,1},{0,0,0,0,1}};
-    maps IIm1(&Im1[0][0],5,5);
-    maps IIm2(&Im2[0][0],5,5);
-    maps IIm3(&Im3[0][0],5,5);
-    maps IIm4(&Im4[0][0],5,5);
-    maps ImTest(&Test[0][0],4,4);*/
 
 using namespace std;
 double f(double x);
 template <typename T, int N>
 vector<T> magic(T (&v) [N]);//из массива в вектор
-template<typename T>
-int pos_max (vector<T> & v);
+
 
 int main()
 {
@@ -104,16 +92,17 @@ int main()
     int temp55 [6] = {10,1,1,1,1,1};
     Info5[4] = magic(temp55);
 
-
-    //net
     //net Temp_Best;
     /*net CNN1(Inputs[0], Info1);
     net CNN2(Inputs[1], Info2);
     net CNN3(Inputs[1], Info3);
+    net CNN4 (Inputs[1], Info4);*/
+    //net CNN5 (Inputs[1], Info5);
     net CNN4 (Inputs[1], Info4);
-    net CNN5 (Inputs[1], Info5);*/
+    cout<<"genetic_algo"<<endl;
+    CNN4.genetic_algo(1, 5, 5, Inputs, Targets);
 
-    net CNN1("Best_1.txt");
+    /*net CNN1("Best_1.txt");
     CNN1.activate(Inputs[1]);
     CNN1.preparation_backprop();
     cout<<CNN1.result(Inputs[1])<<endl;
@@ -128,7 +117,7 @@ int main()
     net CNN4 ("Best_4.txt");
     CNN4.activate(Inputs[1]);
     CNN4.preparation_backprop();
-    cout<<CNN4.result(Inputs[1])<<endl;
+    cout<<CNN4.result(Inputs[1])<<endl;*/
     net CNN5 ("Best_5.txt");
     CNN5.activate(Inputs[1]);
     CNN5.preparation_backprop();
@@ -140,14 +129,15 @@ int main()
     double max4 = 0, global_max4 = 0;
     double max5 = 0, global_max5 = 0;
 
-    double step1 = 0.1, step2 = 0.01, step3 = 0.0006, step4 = 0.0006, step5 = 0.05;
-    for (int i = 0; i < 100; i++)
+    double step1 = 0.01, step2 = 0.01, step3 = 0.01, step4 = 0.01, step5 = 0.05;
+    for (int i = 0; i < 0; i++)
     {
         max1 = 0; max2 = 0; max3 = 0; max4 = 0; max5 = 0;
         for (int j = 0; j < Targets.size()/150; j++)
         {
+            step1 = 0.01; step2 = 0.01; step3 = 0.01; step4 = 0.01; step5 = 0.01;
             int random = (int) (rand() % (Targets.size() -201) +200);
-            step1 += (rand() % 50) /1000 ;
+            /*step1 += (rand() % 50) /1000 ;
             step2 += (rand() % 50) /1000 ;
             CNN1.back_propogation(Targets[random],Inputs[random], step1);
             random = (int) (rand() % Targets.size());
@@ -156,29 +146,30 @@ int main()
             step3 += (rand() % 50) /1000 ;
             CNN3.back_propogation(Targets[random],Inputs[random], step3);
             step4 += (rand() % 50) /1000 ;
-            CNN4.back_propogation(Targets[random],Inputs[random], step4);
+            CNN4.back_propogation(Targets[random],Inputs[random], step4);*/
             step5 += (rand() % 50) /1000 ;
             CNN5.back_propogation(Targets[random],Inputs[random], step5);
         }
         for (int j = 0; j < 200; j++)
         {
             //if (j < 10) cout<<"Net1  res"<<j<<" = " << CNN1.result(Inputs[j],1)<< " Target = "<<pos_max(Targets[j])<<endl;
-            if (CNN1.result(Inputs[j])==pos_max(Targets[j])) max1++;
+            /*if (CNN1.result(Inputs[j])==pos_max(Targets[j])) max1++;
             if (CNN2.result(Inputs[j])==pos_max(Targets[j])) max2++;
             if (CNN3.result(Inputs[j])==pos_max(Targets[j])) max3++;
-            if (CNN4.result(Inputs[j])==pos_max(Targets[j])) max4++;
+            if (CNN4.result(Inputs[j])==pos_max(Targets[j])) max4++;*/
             if (CNN5.result(Inputs[j])==pos_max(Targets[j])) max5++;
         }
-        if (global_max1 < max1) {global_max1 = max1; CNN1.save_net("Best_1.txt");}
+        /*if (global_max1 < max1) {global_max1 = max1; CNN1.save_net("Best_1.txt");}
         if (global_max2 < max2) {global_max2 = max2; CNN2.save_net("Best_2.txt");}
         if (global_max3 < max3) {global_max3 = max3; CNN3.save_net("Best_3.txt");}
-        if (global_max4 < max4) {global_max4 = max4; CNN4.save_net("Best_4.txt");}
+        if (global_max4 < max4) {global_max4 = max4; CNN4.save_net("Best_4.txt");}*/
         if (global_max5 < max5) {global_max5 = max5; CNN5.save_net("Best_5.txt");}
-        cout<<"\nMax1 = "<<max1/200<<"\tMax2 = "<<max2/200<<"\tMax3 = "<<max3/200<<"\tMax4 = "<<max4/200<<"\tMax5 = "<<max5/200<<endl;
-        cout<<"GlobalMax1 = "<<global_max1/200<<endl;
+        //cout<<"\nMax1 = "<<max1/200<<"\tMax2 = "<<max2/200<<"\tMax3 = "<<max3/200<<"\tMax4 = "<<max4/200<<"\tMax5 = "<<max5/200<<endl;
+        /*cout<<"GlobalMax1 = "<<global_max1/200<<endl;
         cout<<"GlobalMax2 = "<<global_max2/200<<endl;
         cout<<"GlobalMax3 = "<<global_max3/200<<endl;
-        cout<<"GlobalMax4 = "<<global_max4/200<<endl;
+        cout<<"GlobalMax4 = "<<global_max4/200<<endl;*/
+        cout<<"\nMax5 = "<<max5<<endl;
         cout<<"GlobalMax5 = "<<global_max5/200<<endl;
     //CNN1.result(Inputs[0],1);
     //CNN1.result(Inputs[1]);
@@ -186,9 +177,20 @@ int main()
     //CNN1.result(Inputs[3]);
     //CNN1.result(Inputs[4]);
     }
-    net CNN("Best_4.txt");
-    CNN.activate(Inputs[107]);
-    cout<<CNN.result(Inputs[107])<<endl;
+    /*CNN5.save_net("Best_5_2.txt");
+    max5 = 0;
+    for (int j = 0; j < 200; j++)
+        {
+            if (CNN5.result(Inputs[j])==pos_max(Targets[j])) max5++;
+        }
+    cout<<"\nT_Max5 = "<<max5<<endl;
+    CNN5.shake(1);
+    max5 = 0;
+    for (int j = 0; j < 200; j++)
+        {
+            if (CNN5.result(Inputs[j])==pos_max(Targets[j])) max5++;
+        }
+    cout<<"\nS_Max5 = "<<max5<<endl;*/
 
     return 0;
 }
@@ -204,13 +206,5 @@ vector<T> magic(T (&v) [N])
         temp[i] = v[i];
         return temp;
 }
-template <typename T>
-int pos_max (vector<T> & v)
-{
-    T max = v[0];
-    int pos = 0;
-    for (int i = 0; i < v.size(); i++)
-        if (max < v[i]) { max = v[i]; pos = i;}
-    return pos;
-}
+
 
