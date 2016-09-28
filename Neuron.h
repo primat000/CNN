@@ -72,6 +72,7 @@ public:
     int get_shift_m();
     void info_feature();
     void reduce();
+    //neuron & operator = (neuron const & NEURON);
     inline bool is_reduce(){if (Kernel > 1) return true; return false;};
     inline int kernel(){return Kernel;};
     inline int final_f_map_n() {if (Kernel > 1)return final_feature_map.size(); cout<<"No reduce"<<endl; return 0;}

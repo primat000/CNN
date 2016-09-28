@@ -14,7 +14,7 @@ vector<T> magic(T (&v) [N]);//из массива в вектор
 int main()
 {
     srand(time(0));
-    int count = 1500;
+    int count = 500;
     ifstream fileTarget ( "result.txt" );
     ifstream fileImage ( "My digits.txt" );
     //work
@@ -98,9 +98,6 @@ int main()
     net CNN3(Inputs[1], Info3);
     net CNN4 (Inputs[1], Info4);*/
     //net CNN5 (Inputs[1], Info5);
-    net CNN4 (Inputs[1], Info4);
-    cout<<"genetic_algo"<<endl;
-    CNN4.genetic_algo(1, 5, 5, Inputs, Targets);
 
     /*net CNN1("Best_1.txt");
     CNN1.activate(Inputs[1]);
@@ -118,10 +115,12 @@ int main()
     CNN4.activate(Inputs[1]);
     CNN4.preparation_backprop();
     cout<<CNN4.result(Inputs[1])<<endl;*/
-    net CNN5 ("Best_5.txt");
-    CNN5.activate(Inputs[1]);
-    CNN5.preparation_backprop();
-    cout<<CNN5.result(Inputs[1])<<endl;
+    net CNN3 (Inputs[1], Info3);
+    CNN3.genetic_algo(50, 5, 0.2, Inputs, Targets);
+    /*net CNN3 ("Best_3.txt");
+    CNN3.activate(Inputs[1]);
+    CNN3.preparation_backprop();
+    cout<<CNN3.result(Inputs[1])<<endl;*/
 
     double max1 = 0, global_max1 = 0;
     double max2 = 0, global_max2 = 0;
@@ -130,68 +129,30 @@ int main()
     double max5 = 0, global_max5 = 0;
 
     double step1 = 0.01, step2 = 0.01, step3 = 0.01, step4 = 0.01, step5 = 0.05;
-    for (int i = 0; i < 0; i++)
+
+    cout<<"!!!! offline !!!!"<<endl;
+    vector<maps> im(10);
+    vector<vector<double> > tar(10);
+    /*for (int i = 0; i < 0; i++)
     {
         max1 = 0; max2 = 0; max3 = 0; max4 = 0; max5 = 0;
-        for (int j = 0; j < Targets.size()/150; j++)
+
+         for (int j = 0; j < 10; j++)
         {
             step1 = 0.01; step2 = 0.01; step3 = 0.01; step4 = 0.01; step5 = 0.01;
             int random = (int) (rand() % (Targets.size() -201) +200);
-            /*step1 += (rand() % 50) /1000 ;
-            step2 += (rand() % 50) /1000 ;
-            CNN1.back_propogation(Targets[random],Inputs[random], step1);
-            random = (int) (rand() % Targets.size());
-            CNN2.back_propogation(Targets[random],Inputs[random], step2);
-            random = (int) (rand() % Targets.size());
-            step3 += (rand() % 50) /1000 ;
-            CNN3.back_propogation(Targets[random],Inputs[random], step3);
-            step4 += (rand() % 50) /1000 ;
-            CNN4.back_propogation(Targets[random],Inputs[random], step4);*/
-            step5 += (rand() % 50) /1000 ;
-            CNN5.back_propogation(Targets[random],Inputs[random], step5);
+            im[j] = Inputs[random];
+            tar[j] = Targets[random];
         }
+        CNN5.back_propogation_offline(tar, im, step3);
         for (int j = 0; j < 200; j++)
         {
-            //if (j < 10) cout<<"Net1  res"<<j<<" = " << CNN1.result(Inputs[j],1)<< " Target = "<<pos_max(Targets[j])<<endl;
-            /*if (CNN1.result(Inputs[j])==pos_max(Targets[j])) max1++;
-            if (CNN2.result(Inputs[j])==pos_max(Targets[j])) max2++;
             if (CNN3.result(Inputs[j])==pos_max(Targets[j])) max3++;
-            if (CNN4.result(Inputs[j])==pos_max(Targets[j])) max4++;*/
-            if (CNN5.result(Inputs[j])==pos_max(Targets[j])) max5++;
         }
-        /*if (global_max1 < max1) {global_max1 = max1; CNN1.save_net("Best_1.txt");}
-        if (global_max2 < max2) {global_max2 = max2; CNN2.save_net("Best_2.txt");}
         if (global_max3 < max3) {global_max3 = max3; CNN3.save_net("Best_3.txt");}
-        if (global_max4 < max4) {global_max4 = max4; CNN4.save_net("Best_4.txt");}*/
-        if (global_max5 < max5) {global_max5 = max5; CNN5.save_net("Best_5.txt");}
-        //cout<<"\nMax1 = "<<max1/200<<"\tMax2 = "<<max2/200<<"\tMax3 = "<<max3/200<<"\tMax4 = "<<max4/200<<"\tMax5 = "<<max5/200<<endl;
-        /*cout<<"GlobalMax1 = "<<global_max1/200<<endl;
-        cout<<"GlobalMax2 = "<<global_max2/200<<endl;
-        cout<<"GlobalMax3 = "<<global_max3/200<<endl;
-        cout<<"GlobalMax4 = "<<global_max4/200<<endl;*/
         cout<<"\nMax5 = "<<max5<<endl;
-        cout<<"GlobalMax5 = "<<global_max5/200<<endl;
-    //CNN1.result(Inputs[0],1);
-    //CNN1.result(Inputs[1]);
-    //CNN1.result(Inputs[2]);
-    //CNN1.result(Inputs[3]);
-    //CNN1.result(Inputs[4]);
-    }
-    /*CNN5.save_net("Best_5_2.txt");
-    max5 = 0;
-    for (int j = 0; j < 200; j++)
-        {
-            if (CNN5.result(Inputs[j])==pos_max(Targets[j])) max5++;
-        }
-    cout<<"\nT_Max5 = "<<max5<<endl;
-    CNN5.shake(1);
-    max5 = 0;
-    for (int j = 0; j < 200; j++)
-        {
-            if (CNN5.result(Inputs[j])==pos_max(Targets[j])) max5++;
-        }
-    cout<<"\nS_Max5 = "<<max5<<endl;*/
-
+        cout<<"GlobalMax5 = "<<global_max3/200<<endl;
+    }*/
     return 0;
 }
 double f(double x)

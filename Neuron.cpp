@@ -347,6 +347,27 @@ void neuron::reduce()
     }
 
 }
+/*neuron & neuron::operator = (neuron const & NEURON)
+{
+        //cout<<"neuron"<<endl;
+    inputs = NEURON.inputs;
+    rec_n = NEURON.rec_n;
+    rec_m = NEURON.rec_m;
+    //cout<<inputs.size()<<endl;
+
+    inp_size = inputs.size();
+
+    Kernel = NEURON.Kernel;
+   // cout<<"in constructor Kernel = "<<K<<endl;
+    weights = NEURON.weights;
+    w0 = NEURON.w0;
+    function_type = NEURON.function_type;
+
+    EXIT = NEURON.EXIT;
+    exit = NEURON.exit;
+    sh_n = NEURON.sh_n; //////////////default = 1
+    sh_m = NEURON.sh_m; //////////////default = 1
+}*/
 /*................class map...............*/
 vector<double> & maps::operator[](int n)
 {
@@ -392,6 +413,7 @@ const maps& maps::operator = (const maps &M)
     for(int i = 0; i < n; i++)
         for (int j = 0; j < m; j++)
         map[i][j] = M.map[i][j];
+
     return *this;
 }
 

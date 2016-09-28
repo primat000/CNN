@@ -21,6 +21,8 @@ public:
     net(const char* filename);
     int result(maps Image, bool flag = false);
     void back_propogation(vector<double> target, maps Image, double Speed = 0.01);
+    void back_propogation_online(vector<double> target, maps Image, double Speed = 0.01);
+    void back_propogation_offline(vector<vector<double> > &target, vector<maps> &Image, double Speed = 0.01, bool isForGen = false);
     void preparation_backprop();
     void info();
     void back_prop_info();
@@ -34,10 +36,15 @@ public:
     net & operator = (const net & NET);
     layer & operator[](int n);
     inline int net_size() {return list_layers.size();};
-    void shake(int n);
+    void shake(double n = -1);
     void genetic_algo(int iter, int count, double per_mutation, vector <maps> & Train, vector<vector<double> > &Targets);
+    void zeroize_diff();
+    void update_weights(double step);
+    void cross (net & NET1, net & NET2);
 };
 template<typename T>
 int pos_max (vector<T> & v);
+template<typename T>
+int pos_min (vector<T> & v);
 
 #endif // NET_H_INCLUDED
